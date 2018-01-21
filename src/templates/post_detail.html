@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Posts</title>
-</head>
-<body>
-	<h1>Template is working</h1>
+{% extends 'base.html' %}
+
+{% block title %}
+{{ block.super }} | {{ post_instance.title }}
+{% endblock title %}
+{% block content %}
+	<div class="col-sm-6 col-sm-offset-3">
+		<h1>{{ post_instance.title }} <small>{{ post_instance.created }}</small></h1>
+		{{ post_instance.content|linebreaks }} <br/>
+	</div>
 	
-	{{ post_instance.title }} <br/>
-	{{ post_instance.content }} <br/>
-	{{ post_instance.created }} <br/>
-	{{ post_instance.last_updated }} <br/>
-</body>
-</html>
+{% endblock content %}
