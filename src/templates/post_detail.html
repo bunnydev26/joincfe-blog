@@ -1,12 +1,42 @@
 {% extends 'base.html' %}
+{% load urlify %}
 
 {% block title %}
 {{ block.super }} | {{ post_instance.title }}
 {% endblock title %}
 {% block content %}
 	<div class="col-sm-6 col-sm-offset-3">
+		{% if post_instance.image %}
+			<img class="img-responsive" src="{{ post_instance.image.url }}" alt="{{ post_instance.title }}" />
+		{% endif %}
+		
 		<h1>{{ post_instance.title }} <small>{{ post_instance.created }}</small></h1>
-		{{ post_instance.content|linebreaks }} <br/>
+		{% if post_instance.user.get_full_name %}
+			<p>Author: {{ post_instance.user.get_full_name }}</p>
+		{% endif %}
+		<p>
+			<div class="fb-like" data-href="{{ post_instance.build_absolute_uri }}" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+			<hr/>
+		</p>
+		<!-- <p>	
+		<a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}">
+			Facebook
+		</a>
+		<a href='https://plus.google.com/share?url={{ request.build_absolute_uri }}'>
+			GooglePlus
+		</a>
+		<a href="https://www.linkedin.com/shareArticle?mini=true&url=http://swiftforentrepreneurs.com/&title={{ post_instance.title }}&summary={{ post_instance.content| urlify }}20%&source={{ request.build_absolute_uri }}">
+		Linkedin
+		</a>
+	</p> -->
+	<div class="row">
+		<div class="col-sm-12">
+			{{ post_instance.content|linebreaks }} 
+			<hr/>
+			<br/>
+			<div class="fb-comments" data-href="{{ post_instance.build_absolute_uri }}" data-numposts="5"></div>
+		</div>
+	</div>
 	</div>
 	
 {% endblock content %}
