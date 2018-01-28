@@ -1,0 +1,7 @@
+h1 {
+	color: #777777;
+}
+
+.post-form input, .post-form textarea {
+	display:block;
+}
