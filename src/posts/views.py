@@ -6,6 +6,8 @@ from .models import Post
 # Create your views here.
 from .forms import PostForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
+from django.db.models import Q
 
 def post_create(request):
 	if not request.user.is_staff or not request.user.is_superuser:
@@ -34,6 +36,11 @@ def post_create(request):
 def post_detail(request, slug=None):
 	context = {}
 	post_instance = get_object_or_404(Post, slug=slug)
+
+	if post_instance.draft or post_instance.publish > timezone.now().date():
+		if (not request.user.is_staff or not request.user.is_superuser):
+			raise Http404
+
 	context['title'] = 'Detail'
 	context['post_instance'] = post_instance
 	context['share_string'] = quote_plus(post_instance.content)
@@ -41,9 +48,22 @@ def post_detail(request, slug=None):
 
 def post_list(request):
 	context = {}
-	post_list = Post.objects.all()
-	
-	paginator = Paginator(post_list, 10) # Show 25 contacts per page
+	if request.user.is_staff or request.user.is_superuser:
+		post_list = Post.objects.all()
+	else:
+		post_list = Post.objects.active()
+
+	query = request.GET.get("q")
+	if query:
+		post_list = post_list.filter(
+			Q(title__icontains=query) |
+			Q(content__icontains=query) |
+			Q(user__first_name__icontains=query) |
+			Q(user__last_name__icontains=query)
+			).distinct()
+
+	today = timezone.now().date()
+	paginator = Paginator(post_list, 2) # Show 25 contacts per page
 	page_request = 'page'
 
 	page = request.GET.get(page_request)
@@ -59,6 +79,7 @@ def post_list(request):
 	context['title'] = "List"
 	context['posts'] = posts
 	context['page_request'] = page_request
+	context['today'] = today
 	return render(request, 'post_list.html', context=context)
 
 def post_update(request, slug=None):

@@ -10,7 +10,7 @@
 			<img class="img-responsive" src="{{ post_instance.image.url }}" alt="{{ post_instance.title }}" />
 		{% endif %}
 		
-		<h1>{{ post_instance.title }} <small>{{ post_instance.created }}</small></h1>
+		<h1>{{ post_instance.title }} <small>{% if post_instance.draft %}<span style="color:red;">Draft </span>{% endif %}{{ post_instance.publish }}</small></h1>
 		{% if post_instance.user.get_full_name %}
 			<p>Author: {{ post_instance.user.get_full_name }}</p>
 		{% endif %}

@@ -2,6 +2,10 @@
 {% block content %}
 	<div class="col-sm-6 col-sm-offset-3">
 		<h1>{{ title }}</h1>
+		<form method="get" action="">
+			<input type="text" name="q" placeholder="Search Posts" value="{{ request.GET.q }}" />
+			<input type="submit" value="Search" />
+		</form>
 		<div class="row">
 			{% for post in posts %}
 			  <div class="col-sm-12">
@@ -10,7 +14,11 @@
 				  		<img class="img-responsive" src="{{ post.image.url }}" alt="{{ post.title }}" />
 				  	{% endif %}
 				  <div class="caption">
-					<h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a> <small>{{ post.created|timesince }} ago</small></h3>
+				  	{{post.publish}}
+				  	{{today}}
+					<h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a> <small>{{ post.publish }}</small></h3>
+					{% if post.draft %}<h3>Staff Only: <span style="color:red;">Draft </span></h3>{% endif %}
+					{% if post.publish > today %}<h3>Staff Only: <span style="color:red;">Future Post </span></h3>{% endif %}
 					<p>Author: {{ post.user.get_full_name }}</p>
 					<p>{{ post.content|linebreaks|truncatechars:120 }}</p>
 					<p><a href="{{ post.get_absolute_url }}" class="btn btn-primary" role="button">View</a></p>
@@ -23,7 +31,7 @@
 		<div class="pagination">
 			<span class="step-links">
 				{% if posts.has_previous %}
-					<a href="?{{ page_request }}={{ posts.previous_page_number }}">previous</a>
+					<a href="?{{ page_request }}={{ posts.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">previous</a>
 				{% endif %}
 
 				<span class="current">
@@ -31,7 +39,7 @@
 				</span>
 
 				{% if posts.has_next %}
-					<a href="?{{ page_request }}={{ posts.next_page_number }}">next</a>
+					<a href="?{{ page_request }}={{ posts.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">next</a>
 				{% endif %}
 			</span>
 		</div>
